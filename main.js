@@ -14,40 +14,24 @@
     );
   }
 
-  function normalizeHeaderText(value) {
-    return (value || '').trim().toLowerCase();
-  }
-
   function findAvailablePluginsTable(root) {
-    const tables = root.querySelectorAll('table');
-    for (const table of tables) {
-      if (!table.tHead || !table.tBodies || !table.tBodies[0]) continue;
-
-      const headerRow = table.tHead.rows[0];
-      if (!headerRow) continue;
-
-      const headerCells = Array.from(headerRow.cells);
-      if (!headerCells.length) continue;
-
-      const headerTexts = headerCells.map((th) =>
-        normalizeHeaderText(th.textContent)
-      );
-
-      const versionColIndex = headerTexts.findIndex((text) => text === 'version');
-      if (versionColIndex === -1) continue;
-
-      const urlColIndex = headerTexts.findIndex((text) =>
-        text === 'url' || text === 'repository' || text === 'repo'
-      );
-
-      const looksLikePluginTable = headerTexts.some((text) =>
-        text.includes('plugin') || text.includes('name')
-      );
-      if (!looksLikePluginTable) continue;
-
-      return { table, versionColIndex, urlColIndex };
+    // Look for a heading that says "Available Plugins"
+    const headings = root.querySelectorAll('h1, h2, h3, h4');
+    for (const h of headings) {
+      const text = (h.textContent || '').trim().toLowerCase();
+      if (text.startsWith('available plugins')) {
+        // Walk forward to find the first TABLE sibling
+        let el = h.nextElementSibling;
+        while (el) {
+          if (el.tagName === 'TABLE') return el;
+          if (el.querySelector) {
+            const nestedTable = el.querySelector('table');
+            if (nestedTable) return nestedTable;
+          }
+          el = el.nextElementSibling;
+        }
+      }
     }
-
     return null;
   }
 
