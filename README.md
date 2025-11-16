@@ -11,25 +11,14 @@ A tiny Stash plugin that turns plugin version entries into clickable links to th
 
 ## Installation
 
-1. Download the latest release ZIP from the GitHub releases page:
-   - `https://github.com/frcooper/stash-plugin-version-links/releases`
-2. Follow the Stash documentation to install a plugin from a ZIP file.
-3. Enable the plugin in Stash if it is not enabled automatically.
+You can install this plugin by adding this repository as a plugin source in Stash:
 
-## Usage
-
-1. Open Stash and go to **Settings → Plugins → Available Plugins**.
-2. For any plugin row that has a GitHub URL configured, the **Version** cell will become a clickable link that opens the plugin URL in a new tab.
-
-No additional configuration is required.
-
-## Development
-
-- Core script: `main.js`
-- Manifest: `plugin-version-links.yml`
-- Build / release index: `index.yml`
-
-You can use `build.sh` to help with packaging or releasing, if you already have a suitable environment configured.
+1. In Stash, go to **Settings → Plugins**.
+2. In the plugin sources / indexes section, add a new source that points to this repository's plugin index URL, for example:
+   - `https://raw.githubusercontent.com/frcooper/stash-plugin-version-links/main/index.yml`
+3. Save the new source, then refresh the Available Plugins list.
+4. Install **Plugin Version Links** from the list.
+5. Enable the plugin in Stash if it is not enabled automatically.
 
 ## License
 
