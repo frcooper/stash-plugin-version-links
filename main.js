@@ -14,39 +14,50 @@
     );
   }
 
+  function normalizeHeaderText(value) {
+    return (value || '').trim().toLowerCase();
+  }
+
   function findAvailablePluginsTable(root) {
-    // Look for a heading that says "Available Plugins"
-    const headings = root.querySelectorAll('h1, h2, h3, h4');
-    for (const h of headings) {
-      const text = (h.textContent || '').trim().toLowerCase();
-      if (text.startsWith('available plugins')) {
-        // Walk forward to find the first TABLE sibling
-        let el = h.nextElementSibling;
-        while (el) {
-          if (el.tagName === 'TABLE') return el;
-          el = el.nextElementSibling;
-        }
-      }
+    const tables = root.querySelectorAll('table');
+    for (const table of tables) {
+      if (!table.tHead || !table.tBodies || !table.tBodies[0]) continue;
+
+      const headerRow = table.tHead.rows[0];
+      if (!headerRow) continue;
+
+      const headerCells = Array.from(headerRow.cells);
+      if (!headerCells.length) continue;
+
+      const headerTexts = headerCells.map((th) =>
+        normalizeHeaderText(th.textContent)
+      );
+
+      const versionColIndex = headerTexts.findIndex((text) => text === 'version');
+      if (versionColIndex === -1) continue;
+
+      const urlColIndex = headerTexts.findIndex((text) =>
+        text === 'url' || text === 'repository' || text === 'repo'
+      );
+
+      const looksLikePluginTable = headerTexts.some((text) =>
+        text.includes('plugin') || text.includes('name')
+      );
+      if (!looksLikePluginTable) continue;
+
+      return { table, versionColIndex, urlColIndex };
     }
+
     return null;
   }
 
   function enhanceAvailablePluginsTable() {
     if (!isLikelyPluginsPage()) return;
 
-    const table = findAvailablePluginsTable(document);
-    if (!table) return;
-    if (!table.tHead || !table.tBodies || !table.tBodies[0]) return;
+    const info = findAvailablePluginsTable(document);
+    if (!info) return;
 
-    const headerCells = Array.from(table.tHead.rows[0].cells);
-    const versionColIndex = headerCells.findIndex((th) =>
-      (th.textContent || '').trim().toLowerCase() === 'version'
-    );
-    const urlColIndex = headerCells.findIndex((th) =>
-      (th.textContent || '').trim().toLowerCase() === 'url'
-    );
-
-    if (versionColIndex === -1) return; // schema changed, bail
+    const { table, versionColIndex, urlColIndex } = info;
 
     const bodyRows = Array.from(table.tBodies[0].rows);
 
