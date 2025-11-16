@@ -24,6 +24,10 @@
         let el = h.nextElementSibling;
         while (el) {
           if (el.tagName === 'TABLE') return el;
+          if (el.querySelector) {
+            const nestedTable = el.querySelector('table');
+            if (nestedTable) return nestedTable;
+          }
           el = el.nextElementSibling;
         }
       }
