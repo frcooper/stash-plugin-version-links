@@ -1,7 +1,7 @@
 - id: plugin-version-links
   name: Plugin Version Links
   version: "0.1.0"
-  date: "2025-11-15"
+  date: "2025-11-15 21:33:00"
   requires: []
   path: https://github.com/frcooper/stash-plugin-version-links/releases/download/v0.1.0/plugin-version-links-0.1.0.zip
   sha256: "086fc7183ed75a84d1ca58016ba95d3ac7c8148f4cd944ab777f0142e08be3e5"

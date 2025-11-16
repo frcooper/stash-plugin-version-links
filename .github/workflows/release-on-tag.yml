@@ -33,7 +33,7 @@ jobs:
       - name: Update index.yml entry
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
-          DATE=$(date +"%Y-%m-%d")
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           REPO="${{ github.repository }}" # e.g. owner/repo
           # Update version, date, path and clear sha256 (will be replaced later)
           sed -i "s/^  version: \".*\"/  version: \"$VERSION\"/" index.yml
