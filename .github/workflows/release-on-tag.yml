@@ -1,0 +1,93 @@
+name: Release on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          # github.ref looks like refs/tags/v0.1.1
+          TAG_REF="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_REF#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Show version
+        run: echo "Version is ${{ steps.get_version.outputs.version }}"
+
+      - name: Update plugin-version-links.yml version
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          # Replace the version field in plugin-version-links.yml
+          sed -i "s/^version: \".*\"/version: \"$VERSION\"/" plugin-version-links.yml
+
+      - name: Update index.yml entry
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          DATE=$(date +"%Y-%m-%d")
+          REPO="${{ github.repository }}" # e.g. owner/repo
+          # Update version, date, path and clear sha256 (will be replaced later)
+          sed -i "s/^  version: \".*\"/  version: \"$VERSION\"/" index.yml
+          sed -i "s/^  date: \".*\"/  date: \"$DATE\"/" index.yml
+          sed -i "s#^  path: .*#  path: https://github.com/$REPO/releases/download/v$VERSION/plugin-version-links-$VERSION.zip#" index.yml
+          sed -i "s/^  sha256: \".*\"/  sha256: \"TODO_SHA256\"/" index.yml
+
+      - name: Make dist directory
+        run: mkdir -p dist
+
+      - name: Copy plugin files to dist
+        run: |
+          cp plugin-version-links.yml dist/
+          cp main.js dist/
+
+      - name: Build ZIP
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          cd dist
+          zip -r "plugin-version-links-$VERSION.zip" plugin-version-links.yml main.js
+
+      - name: Generate sha256 checksum
+        id: checksum
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          cd dist
+          sha256sum "plugin-version-links-$VERSION.zip" > "plugin-version-links-$VERSION.zip.sha256"
+          SHA=$(cut -d" " -f1 "plugin-version-links-$VERSION.zip.sha256")
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Update index.yml sha256 with real value
+        run: |
+          SHA="${{ steps.checksum.outputs.sha256 }}"
+          sed -i "s/^  sha256: \"TODO_SHA256\"/  sha256: \"$SHA\"/" index.yml
+
+      - name: Commit updated metadata (optional)
+        if: github.event_name == 'push'
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add plugin-version-links.yml index.yml
+          git commit -m "chore: release v$VERSION" || echo "No changes to commit"
+          git push origin "HEAD:${GITHUB_REF#refs/heads/}" || echo "Not pushing changes for tag refs"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/plugin-version-links-*.zip
+            dist/plugin-version-links-*.zip.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
