@@ -38,19 +38,10 @@
   function enhanceAvailablePluginsTable() {
     if (!isLikelyPluginsPage()) return;
 
-    const table = findAvailablePluginsTable(document);
-    if (!table) return;
-    if (!table.tHead || !table.tBodies || !table.tBodies[0]) return;
+    const info = findAvailablePluginsTable(document);
+    if (!info) return;
 
-    const headerCells = Array.from(table.tHead.rows[0].cells);
-    const versionColIndex = headerCells.findIndex((th) =>
-      (th.textContent || '').trim().toLowerCase() === 'version'
-    );
-    const urlColIndex = headerCells.findIndex((th) =>
-      (th.textContent || '').trim().toLowerCase() === 'url'
-    );
-
-    if (versionColIndex === -1) return; // schema changed, bail
+    const { table, versionColIndex, urlColIndex } = info;
 
     const bodyRows = Array.from(table.tBodies[0].rows);
 
