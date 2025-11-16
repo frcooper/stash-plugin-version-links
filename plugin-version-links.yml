@@ -1,6 +1,6 @@
 name: Plugin Version Links
 description: Turns plugin versions into links to the plugin URL (e.g. GitHub) on the Available Plugins list.
-version: "0.1.0"
+version: "0.1.3"
 url: "https://github.com/frcooper/stash-plugin-version-links"
 
 ui:
