@@ -72,15 +72,15 @@ jobs:
           SHA="${{ steps.checksum.outputs.sha256 }}"
           sed -i "s/^  sha256: \"TODO_SHA256\"/  sha256: \"$SHA\"/" index.yml
 
-      - name: Commit updated metadata (optional)
+      - name: Commit updated metadata
         if: github.event_name == 'push'
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add plugin-version-links.yml index.yml
-          git commit -m "chore: release v$VERSION" || echo "No changes to commit"
-          git push origin HEAD:main || echo "Not pushing changes to main"
+          git commit -m "chore: release v$VERSION"
+          git push origin HEAD:main
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
