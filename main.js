@@ -59,18 +59,14 @@
     return null;
   }
 
-  function linkifyText(target, text, url) {
-    target.textContent = '';
-    const anchor = document.createElement('a');
-    anchor.textContent = text;
-    anchor.href = url;
-    anchor.target = '_blank';
-    anchor.rel = 'noopener noreferrer';
-    target.appendChild(anchor);
-  }
+  function enhanceAvailablePluginsTable() {
+    if (!isLikelyPluginsPage()) return;
 
-  function enhanceLegacyTable(table, versionColIndex, urlColIndex) {
-    if (!table.tBodies || !table.tBodies[0]) return;
+    const info = findAvailablePluginsTable(document);
+    if (!info) return;
+
+    const { table, versionColIndex, urlColIndex } = info;
+
     const bodyRows = Array.from(table.tBodies[0].rows);
 
     for (const row of bodyRows) {

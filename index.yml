@@ -1,9 +1,9 @@
 - id: plugin-version-links
   name: Plugin Version Links
-  version: "0.1.4"
-  date: "2025-11-16 05:51:03"
+  version: "0.1.5"
+  date: "2025-11-16 06:29:08"
   requires: []
-  path: https://github.com/frcooper/stash-plugin-version-links/releases/download/v0.1.4/plugin-version-links-0.1.4.zip
-  sha256: "42d23099768963ce514071ed7382ec7eb0ff04ab7f3c0bdc7d040fd49a38b3fe"
+  path: https://github.com/frcooper/stash-plugin-version-links/releases/download/v0.1.5/plugin-version-links-0.1.5.zip
+  sha256: "91a2413626f5f128bdac947489f7d3e2d8b8d3f943586988f29cf4c304f06a8f"
   metadata:
     url: "https://github.com/frcooper/stash-plugin-version-links"
